@@ -12,7 +12,9 @@ public class Point
 {
 	private double x;
 	private double y;
-	public static final int radius = 1; //sets radius
+	private int xOnGrid;
+	private int yOnGrid;
+	public static final int radius = 3; //sets radius
 	
 	public Point(double xCoord, double yCoord) //creates point
 	{
@@ -36,13 +38,13 @@ public class Point
 		return radius;
 	}
 
-	public void renderPoint(Graphics g) //draws point on the grid
+	public void renderPoint(Graphics g, int xCoord, int yCoord) //draws point on the grid
 	{
 		//super.paintComponent(g);
       Graphics2D g2 = (Graphics2D) g;
       
       ///***REMEMBER TO FIX X & Y***///
-		g2.drawOval((int)x, (int)y, radius, radius); //convert x & y coords to ints in order to draw circle
+		g2.fillOval((int)x, (int)y, radius, radius); //convert x & y coords to ints in order to draw circle
 	}
 	
 }
