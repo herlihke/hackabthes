@@ -1,0 +1,35 @@
+import java.awt.Graphics;
+import java.util.ArrayList;
+
+
+public class PseudoLine {
+	//INSTANCE FIELDS
+	ArrayList<Point> line;
+	
+	//CONSTRUCTORS
+	public PseudoLine()
+	{
+		line = new ArrayList<Point>();
+		createPoints();
+	}
+
+	//METHODS
+	private void createPoints() {
+		for(double i = -400; i<400; i+=0.1)
+		{
+			line.add(new Point(i, i*0.4));
+		}
+		
+	}
+	
+	public void renderAllPoints(Graphics g)
+	{
+		for(Point p: line)
+		{
+			p.renderPoint(g);
+		}
+	}
+	
+	
+	
+}
