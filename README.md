@@ -1,2 +1,0 @@
-# hackabthes
-hackathoners
