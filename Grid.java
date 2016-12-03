@@ -9,16 +9,22 @@ import javax.swing.JComponent;
 
 public class Grid extends JComponent{
 	//INSTANCE FIELDS
-	private int frameMinX, frameMaxX, frameMinY, frameMaxY;
-	private int smallestX, smallestY, largestX, largestY; 
+	private int frameMinX, frameMaxX, frameMinY, frameMaxY; //coordinates of the frame
 	
-	private Rectangle xAxis, yAxis;
+	private int smallestX, smallestY, largestX, largestY; //function maxs and mins
+	
 	private final int lineThickness = 3;
 	
+
+	private Rectangle xAxis, yAxis;
 	private ArrayList <Line2D> horizantalGridLines, verticalGridLines;
 	private final int gridLineSpacingX = 40, gridLineSpacingY = 40;//how much space is in between each grid line
-	
+	private double xSpacing, ySpacing;
 	private boolean showGridLines; //if the x and y grid lines should appear
+	
+	private ArrayList<GridLabels> xAxisLabels, yAxisLabels;
+	
+	private PseudoLine line = new PseudoLine();
 
 	//CONSTRUCTORS
 	//default constructors
@@ -28,20 +34,26 @@ public class Grid extends JComponent{
 		frameMaxX = 800; //GOING TO BE GET WIDTH
 		frameMinY = 0; //HEIGHT OF TOP BAR
 		frameMaxY = 600; //GOING TO BE GET HEIGHT
+		
 		smallestX = -10; //KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
 		largestX = 10;//KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
 		smallestY = -10;//KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
 		largestY = 10;//KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
 		
+		xSpacing = gridLineSpacingX/(largestX-smallestX);
+		ySpacing = gridLineSpacingY/(largestY-smallestY);
+		
 		//sets spacing between each grid line in pixels
 		horizantalGridLines = new ArrayList<Line2D>();
 		verticalGridLines = new ArrayList<Line2D>();
+		xAxisLabels = new ArrayList<GridLabels>();
+		yAxisLabels = new ArrayList<GridLabels>();
 		createHorizantalGridLines();
 		createVerticalGridLines();
-		
 		createAxes();
 		
 		showGridLines = true; //HARDCODED
+		
 	}
 	
 	//constructor with inputs
@@ -56,15 +68,20 @@ public class Grid extends JComponent{
 		smallestY = smY;
 		largestY = laY;
 		
+		xSpacing = gridLineSpacingX/(largestX-smallestX);
+		ySpacing = gridLineSpacingY/(largestY-smallestY);
+		
 		//sets spacing between each grid line in pixels
 		horizantalGridLines = new ArrayList<Line2D>();
 		verticalGridLines = new ArrayList<Line2D>();
+		xAxisLabels = new ArrayList<GridLabels>();
+		yAxisLabels = new ArrayList<GridLabels>();
 		createHorizantalGridLines();
 		createVerticalGridLines();
-		
 		createAxes();
 		
-		showGridLines = false; //HARDCODED
+		showGridLines = true; //HARDCODED
+		
 	}
 	
 	//METHODS
@@ -121,8 +138,17 @@ public class Grid extends JComponent{
 		//while the line of the soon to be made grid is still on jframe
 		while(yZero-(i*gridLineSpacingY) < frameMaxY)
 		{
+			
+			//creates grid line
 			Line2D nextLine = new Line2D.Double(frameMinX, yZero-(i*gridLineSpacingY), frameMaxX, yZero-(i*gridLineSpacingY));
 			horizantalGridLines.add(nextLine);
+			
+			//creates labels
+			yAxisLabels.add(
+					new GridLabels(xSpacing*i +"", 
+							changePointXToJframeX(0), yZero-(i*gridLineSpacingY)));
+			
+			//increment
 			i--;
 		}
 		
@@ -130,8 +156,16 @@ public class Grid extends JComponent{
 		i = 1;
 		while(yZero-(i*gridLineSpacingY) > frameMinY)
 		{
+			//creates grid line
 			Line2D nextLine = new Line2D.Double(frameMinX, yZero-(i*gridLineSpacingY), frameMaxX, yZero-(i*gridLineSpacingY));
 			horizantalGridLines.add(nextLine);
+			
+			//create labels
+			yAxisLabels.add(
+					new GridLabels(xSpacing*i +"",
+							changePointXToJframeX(0), yZero-(i*gridLineSpacingY)));
+			
+			//increment
 			i++;
 		}
 	}
@@ -147,24 +181,42 @@ public class Grid extends JComponent{
 		//while the line of the soon to be made grid is still on jframe
 		while(xZero-(i*gridLineSpacingX) > frameMinX)
 		{
+			//creates the grid line
 			Line2D nextLine = new Line2D.Double(xZero-(i*gridLineSpacingX), frameMinY, xZero-(i*gridLineSpacingX), frameMaxY);
 			horizantalGridLines.add(nextLine);
+			
+			//create labels
+			xAxisLabels.add(
+					new GridLabels(ySpacing*-i +"", 
+							xZero-(i*gridLineSpacingY), changePointYToJframeY(0)));
+			
+			//increment
 			i++;
 		}
 		
-		//this part gets the lines left the axis
+		//this part gets the lines right the axis
 		i = -1;
 		//while the line of the soon to be made grid is still on jframe
 		while(xZero-(i*gridLineSpacingX) < frameMaxX)
 		{
+			
+			//creates grid line
 			Line2D nextLine = new Line2D.Double(xZero-(i*gridLineSpacingX), frameMinY, xZero-(i*gridLineSpacingX), frameMaxY);
 			horizantalGridLines.add(nextLine);
+			
+			//create labels
+			xAxisLabels.add(
+					new GridLabels(ySpacing*-i +"", 
+							xZero-(i*gridLineSpacingY), changePointYToJframeY(0)));
+			
+			//increment
 			i--;
 		}
 	}
 	
 	public void render(Graphics g)
 	{
+		//graphics object
 		Graphics2D g2 = (Graphics2D) g;
 		
 		//if the user wants to show grid lines render them
@@ -186,6 +238,19 @@ public class Grid extends JComponent{
 		//fill axes
 		g2.fill(xAxis);
 		g2.fill(yAxis);
+		
+		//show all axis labels
+		for(GridLabels l: xAxisLabels)
+		{
+			l.render(g2);
+		}
+		
+		for(GridLabels l: yAxisLabels)
+		{
+			l.render(g2);
+		}
+		
+		line.renderAllPoints(g2);
 		
 	}
 }
