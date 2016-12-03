@@ -13,9 +13,10 @@ public class Grid extends JComponent{
 	private int smallestX, smallestY, largestX, largestY; 
 	
 	private Rectangle xAxis, yAxis;
+	private final int lineThickness = 3;
 	
-	private Line2D[] xGridLines, yGridLines;
-	private int numOfGridLinesX, numOfGridLinesY;
+	private ArrayList <Line2D> horizantalGridLines, verticalGridLines;
+	private final int gridLineSpacingX = 40, gridLineSpacingY = 40;//how much space is in between each grid line
 	
 	private boolean showGridLines; //if the x and y grid lines should appear
 
@@ -25,22 +26,20 @@ public class Grid extends JComponent{
 	{
 		frameMinX = 0;
 		frameMaxX = 800; //GOING TO BE GET WIDTH
-		frameMinY = 22; //HEIGHT OF TOP BAR
+		frameMinY = 0; //HEIGHT OF TOP BAR
 		frameMaxY = 600; //GOING TO BE GET HEIGHT
 		smallestX = -10; //KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
 		largestX = 10;//KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
 		smallestY = -10;//KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
 		largestY = 10;//KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
 		
-		//sets number of grid lines of each coord
-		numOfGridLinesX = 10; //HARDCODED MAY WANT TO CHANGE
-		numOfGridLinesY = 10;//HARDCODED MAY WANT TO CHANGE
+		//sets spacing between each grid line in pixels
+		horizantalGridLines = new ArrayList<Line2D>();
+		verticalGridLines = new ArrayList<Line2D>();
+		createHorizantalGridLines();
+		createVerticalGridLines();
 		
-		//initializes array of the number of lines we want 
-		xGridLines = new Line2D[numOfGridLinesX];
-		yGridLines = new Line2D[numOfGridLinesY];
-		createXGridLines();
-		createYGridLines();
+		createAxes();
 		
 		showGridLines = true; //HARDCODED
 	}
@@ -57,17 +56,15 @@ public class Grid extends JComponent{
 		smallestY = smY;
 		largestY = laY;
 		
-		//sets number of grid lines of each coord
-		numOfGridLinesX = 10; //HARDCODED MAY WANT TO CHANGE
-		numOfGridLinesY = 10;//HARDCODED MAY WANT TO CHANGE
+		//sets spacing between each grid line in pixels
+		horizantalGridLines = new ArrayList<Line2D>();
+		verticalGridLines = new ArrayList<Line2D>();
+		createHorizantalGridLines();
+		createVerticalGridLines();
 		
-		//initializes array of the number of lines we want 
-		xGridLines = new Line2D[numOfGridLinesX];
-		yGridLines = new Line2D[numOfGridLinesY];
-		createXGridLines();
-		createYGridLines();
+		createAxes();
 		
-		showGridLines = true; //HARDCODED
+		showGridLines = false; //HARDCODED
 	}
 	
 	//METHODS
@@ -95,44 +92,74 @@ public class Grid extends JComponent{
 		//gets what each unit of the grid should be
 		int unitY = frameSpreadY / functionSpreadY;
 		
-		int YCoord = (int) ((pointY - smallestY) * unitY);
+		//you need to flip y coordinates so subtract framemaxy from it
+		int YCoord = (int) (frameMaxY-(pointY - smallestY) * unitY);
 		
 		return YCoord;
 	}
 	
-	//method fills array with lines that are the coordinate plane
-	private void createXGridLines()
+	private void createAxes()
 	{
-		//gets the spread between the max and the min of both frame and function
-		int frameSpreadX = frameMaxX-frameMinX;
+		//find coordinate on graph that equals 0 for x and 0 for y
+		//calls method on itself
+		int xInt = changePointYToJframeY(0);
+		int yInt = changePointXToJframeX(0);
 		
-		//gets how far apart the grid lines are apart in units
-		int lineSpreadX = frameSpreadX / numOfGridLinesX;
+		xAxis = new Rectangle(frameMinX, xInt, frameMaxX-frameMinX, lineThickness);
+		yAxis = new Rectangle(yInt, frameMinY, lineThickness, frameMaxY-frameMinX);
+		System.out.println(xInt + " " + yInt);
+	}
+	
+	//method fills array with lines that are the coordinate plane
+	private void createHorizantalGridLines()
+	{
+		//gets x axis aka y=0
+		int yZero = changePointYToJframeY(0);
 		
-		for(int i=0; i<numOfGridLinesX; i++)
+		//this part gets the lines below the axis
+		int i = -1;
+		//while the line of the soon to be made grid is still on jframe
+		while(yZero-(i*gridLineSpacingY) < frameMaxY)
 		{
-			//creates a new line, adds it to array, witht the coordinates of each of the grid lines
-			int xCoord = lineSpreadX*(i+1);
-			//x coords same, y spans the min to the max of the grid
-			xGridLines[i] = new Line2D.Double(xCoord, frameMinY, xCoord, frameMaxY);
+			Line2D nextLine = new Line2D.Double(frameMinX, yZero-(i*gridLineSpacingY), frameMaxX, yZero-(i*gridLineSpacingY));
+			horizantalGridLines.add(nextLine);
+			i--;
+		}
+		
+		//this part gets the lines above the axis
+		i = 1;
+		while(yZero-(i*gridLineSpacingY) > frameMinY)
+		{
+			Line2D nextLine = new Line2D.Double(frameMinX, yZero-(i*gridLineSpacingY), frameMaxX, yZero-(i*gridLineSpacingY));
+			horizantalGridLines.add(nextLine);
+			i++;
 		}
 	}
 	
 	//method fills array with lines that are the coordinate plane
-	private void createYGridLines()
+	private void createVerticalGridLines()
 	{
-		//gets the spread between the max and the min of both frame and function
-		int frameSpreadY = frameMaxY-frameMinY;
+		//get y axis aka x= 0
+		int xZero = changePointXToJframeX(0);
 		
-		//gets how far apart the grid lines are apart in units
-		int lineSpreadY = frameSpreadY / numOfGridLinesY;
-		
-		for(int i=0; i<numOfGridLinesY; i++)
+		//this part gets the lines left the axis
+		int i = 1;
+		//while the line of the soon to be made grid is still on jframe
+		while(xZero-(i*gridLineSpacingX) > frameMinX)
 		{
-			//creates a new line, adds it to array, witht the coordinates of each of the grid lines
-			int yCoord = lineSpreadY*(i+1);
-			//y coords same, x spans the min to the max of the grid
-			yGridLines[i] = new Line2D.Double(frameMinX, yCoord, frameMaxX, yCoord);
+			Line2D nextLine = new Line2D.Double(xZero-(i*gridLineSpacingX), frameMinY, xZero-(i*gridLineSpacingX), frameMaxY);
+			horizantalGridLines.add(nextLine);
+			i++;
+		}
+		
+		//this part gets the lines left the axis
+		i = -1;
+		//while the line of the soon to be made grid is still on jframe
+		while(xZero-(i*gridLineSpacingX) < frameMaxX)
+		{
+			Line2D nextLine = new Line2D.Double(xZero-(i*gridLineSpacingX), frameMinY, xZero-(i*gridLineSpacingX), frameMaxY);
+			horizantalGridLines.add(nextLine);
+			i--;
 		}
 	}
 	
@@ -144,17 +171,21 @@ public class Grid extends JComponent{
 		if(showGridLines)
 		{
 			//go through all x and y grid lines and print them
-			for(Line2D lx :xGridLines)
+			for(Line2D lx :horizantalGridLines)
 			{
 				g2.draw(lx);
 			}
 			
 			//go through all x and y grid lines and print them
-			for(Line2D ly :yGridLines)
+			for(Line2D ly :verticalGridLines)
 			{
 				g2.draw(ly);
 			}
 		}
+		
+		//fill axes
+		g2.fill(xAxis);
+		g2.fill(yAxis);
 		
 	}
 }
