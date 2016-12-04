@@ -117,6 +117,14 @@ public class Line
 	}
 	
 	//self explanatory- MATH METHODS
+	public void printArray()
+	{
+		for(int i =0; i<allPoints.size(); i++)
+		{
+			System.out.println(allPoints.get(i));
+		}
+	
+	}
 	public String multiply(String object, String object2)
 	{
 		boolean notAllNumbers  = false;
@@ -138,12 +146,8 @@ public class Line
 	    
 		if(notAllNumbers)
 		{
-			String answer = (Double.parseDouble(object)*Double.parseDouble(object2))+"";
-			if(answer.substring(answer.indexOf(".")).length() > 4)
-			{
-				answer.substring(0, answer.indexOf(".")+4);
-			}
-			return answer.substring(0, answer.length()-1);
+			
+			return (Double.parseDouble(object)*Double.parseDouble(object2))+"";
 		
 		}
 		return object + object2;
@@ -170,12 +174,7 @@ public class Line
 	    
 		if(notAllNumbers)
 		{
-			String answer = (Double.parseDouble(object)/Double.parseDouble(object2))+"";
-			if(answer.substring(answer.indexOf(".")).length() > 4)
-			{
-				answer.substring(0, answer.indexOf(".")+4);
-			}
-			return answer.substring(0, answer.length()-1);
+			return (Double.parseDouble(object)/Double.parseDouble(object2))+"";
 		
 		}
 		return object + object2;
@@ -203,12 +202,7 @@ public class Line
 		if(notAllNumbers)
 		{
 			
-			String answer = (Double.parseDouble(object)+Double.parseDouble(object2))+"";
-			if(answer.substring(answer.indexOf(".")).length() > 4)
-			{
-				answer.substring(0, answer.indexOf(".")+4);
-			}
-			return answer.substring(0, answer.length()-1);
+			return (Double.parseDouble(object)+Double.parseDouble(object2))+"";
 		
 		}
 		return object + object2;
@@ -235,12 +229,7 @@ public class Line
 	    
 		if(notAllNumbers)
 		{
-			String answer = (Double.parseDouble(object)-Double.parseDouble(object2))+"";
-			if(answer.substring(answer.indexOf(".")).length() > 4)
-			{
-				answer.substring(0, answer.indexOf(".")+4);
-			}
-			return answer.substring(0, answer.length()-1);
+			return (Double.parseDouble(object)-Double.parseDouble(object2))+"";
 		
 		}
 		return object + object2;
@@ -268,12 +257,7 @@ public class Line
 	    
 		if(notAllNumbers)
 		{
-			String answer = (Math.pow(Double.parseDouble(object), Double.parseDouble(object2)))+"";
-			if(answer.substring(answer.indexOf(".")).length() > 4)
-			{
-				answer.substring(0, answer.indexOf(".")+4);
-			}
-			return answer.substring(0, answer.length()-1);
+			return (Math.pow(Double.parseDouble(object), Double.parseDouble(object2))+"");
 		
 		}
 		return object + object2;
@@ -282,8 +266,10 @@ public class Line
 	public void createPoints()
 	{
 		for(double i = -10.0; i<=10.0; i++ )
-		{
-			allPoints.add(new Point(i, Double.parseDouble(findAnswer(equation, i))));
+		{			
+		  System.out.println(Double.parseDouble(findAnswer(equation, 2)));
+		  //Point myPoint = new Point(i, Double.parseDouble(findAnswer(equation, i)));
+		  //allPoints.add(myPoint);
 		}
 	}
 	
