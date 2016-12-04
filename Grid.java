@@ -24,18 +24,18 @@ public class Grid extends JComponent{
 	
 	private ArrayList<GridLabels> xAxisLabels, yAxisLabels;
 	
-	private PseudoLine line = new PseudoLine();
+	private Line line;
 
 	//CONSTRUCTORS
 	//default constructors
-	public Grid()
+	public Grid(String inputEquation)
 	{
 		frameMinX = 0;
 		frameMaxX = 800; //GOING TO BE GET WIDTH
 		frameMinY = 0; //HEIGHT OF TOP BAR
 		frameMaxY = 600; //GOING TO BE GET HEIGHT
 		
-		smallestX = -10; //KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
+		smallestX = 0; //KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
 		largestX = 10;//KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
 		smallestY = -10;//KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
 		largestY = 10;//KEEP HARDCODED THIS IS IF FUNCTION IS NOT INPUTTED
@@ -53,6 +53,8 @@ public class Grid extends JComponent{
 		createAxes();
 		
 		showGridLines = true; //HARDCODED
+		
+		line = new Line(inputEquation);
 		
 	}
 	
@@ -250,7 +252,12 @@ public class Grid extends JComponent{
 			l.render(g2);
 		}
 		
-		line.renderAllPoints(g2);
+		for(int i = 0; i<line.getSize(); i++)
+		{
+			Point p = line.getPointAt(i);
+			p.renderPoint(g2, this.changePointXToJframeX(p.getPointX()), this.changePointYToJframeY(p.getPointY()));
+		}
 		
 	}
 }
+
