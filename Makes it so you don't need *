@@ -1,0 +1,11 @@
+for(int i = 0; i < (equation.length()-2); i++)
+      {
+           String check = equation.substring(i,i+2);
+     
+           if((check.charAt(0) >= 48 && check.charAt(0) <= 57) && (check.charAt(1) >= 97 && check.charAt(1) <=122));
+           {
+             String first = equation.substring(0,i+1);
+             String second = equation.substring(i+1);
+             equation = first + "*" + second;
+           }
+       }
