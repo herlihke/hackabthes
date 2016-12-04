@@ -4,219 +4,326 @@ Program Name: Line.java
 Description: 
 */
 
-import java.rmi.server.Operation;
+import java.awt.Graphics;
 import java.util.ArrayList;
+
 public class Line
-
 {
-   private String Stringnum = "";
-   private String equation;
-   Double xvar;
-   private String original;
-   //private ArrayList<Points> points;
-   private ArrayList<String> parts;
-   private ArrayList<String> operator;
-   private ArrayList<Double> numbers;
+	//INSTANCE FIELDS
+	String equation;
+	private ArrayList<Point> allPoints;
 
-   public  Line( String n )
-   {
-      equation = "3x +1";
-      original = "" + equation;
-      //points = new ArrayList<Points>();
-      parts = new ArrayList<String>();
-      operator = new ArrayList<String>();
-      numbers = new ArrayList<Double>();
-      //this.createEq();
-   }
-
-   public void imafuckindoit()
-   {
-      //adds * symbol if it finds a number next to a variable
-      for(int i = 0; i < (equation.length()-2); i++)
-      {
-           String check = equation.substring(i,i+2);
-     
-           if((check.charAt(0) >= 48 && check.charAt(0) <= 57) && (check.charAt(1) >= 97 && check.charAt(1) <=122));
-           {
-             String first = equation.substring(0,i+1);
-             String second = equation.substring(i+1);
-             equation = first + "*" + second;
-           }
-       }
-      //divides the equation into different sections
-      //operators are put into an operator arrayList
-      //numbers and variables are put into parts arrayList
-      for(int i = 0;i < equation.length();i++)
-      {
-         //ascii values of operators
-         if(equation.charAt(i) == 42 || equation.charAt(i) == 43 || equation.charAt(i) == 45 || equation.charAt(i) == 47)
-         {
-            parts.add(equation.substring(0,i));
-            operator.add(equation.substring(i,i+1));            
-            equation = equation.substring(i+1);
-         }
-      }
-   }
+	//CONSTRUCTORS
+	public Line(String inputLine)
+	{
+		equation = inputLine; //HARDCODED CHANGE LATER
+		allPoints = new ArrayList<Point>();
+      
+		//calls private method to remove all spaces
+		trimEquation();
+		
+		//creates all points for graph
+		createPoints();
+	}
    
- 
-   public void convert()
-   {
-     this.imafuckindoit();
-     //converts the positions of an ArrayList into Integers (not ints) and puts them into a number ArrayList
-     for(int i = 0; i < parts.size(); i++)
-     {
-       String it = parts.get(i);
-       //numbers
-       if(it.charAt(0) >= 48 && it.charAt(0) <= 57)
-       {
-          Double num = Double.parseDouble(it);
-          numbers.add(num);
-       }
-       //variables
-       else if(it .equals("x"))
-       {
-          numbers.add(xvar);
-       }
-     }
-   }
+	//METHODS
+	//RECURSION TO GET THE ANSWER
+	private String findAnswer(String myEquation, double x)
+	{
+		
+		//if there is operation, figure it out 
+		if(myEquation.indexOf("x") != -1)
+		{
+			int positionOfX = myEquation.indexOf("x");
+			String part1 = myEquation.substring(0, positionOfX);
+			String part2 = myEquation.substring(positionOfX + 1);
+			myEquation = part1 + x + part2;
+			findAnswer(myEquation, x);
+		}
+		
+		if(myEquation.indexOf("+") != -1)
+		{
+			int positionOfAdd = myEquation.indexOf("+");
+			String part1 = myEquation.substring(0, positionOfAdd);
+			String part2 = myEquation.substring(positionOfAdd + 1);
+			myEquation = add(findAnswer(part1, x), findAnswer(part2, x));
+		}
+		//if there is operation, figure it out 
+		else if(myEquation.indexOf("-") != -1)
+		{
+			int positionOfSubtract = myEquation.indexOf("-");
+			String part1 = myEquation.substring(0, positionOfSubtract);
+			String part2 = myEquation.substring(positionOfSubtract + 1);
+			myEquation = subtract(findAnswer(part1, x), findAnswer(part2, x));
+		}
+		else if(myEquation.indexOf("*") != -1)
+		{
+			int positionOfMultiply = myEquation.indexOf("*");
+			String part1 = myEquation.substring(0, positionOfMultiply);
+			String part2 = myEquation.substring(positionOfMultiply + 1);
+			myEquation = multiply(findAnswer(part1, x), findAnswer(part2, x));
+		}
+		else if(myEquation.indexOf("/") != -1)
+		{
+			int positionOfDivide = myEquation.indexOf("/");
+			String part1 = myEquation.substring(0, positionOfDivide);
+			String part2 = myEquation.substring(positionOfDivide + 1);
+			myEquation = divide(findAnswer(part1, x), findAnswer(part2, x));
+		}
+		else if(myEquation.indexOf("^") != -1)
+		{
+			int positionOfPow = myEquation.indexOf("^");
+			String part1 = myEquation.substring(0, positionOfPow);
+			String part2 = myEquation.substring(positionOfPow + 1);
+			myEquation = power(findAnswer(part1, x), findAnswer(part2, x));
+		}
+		//if there are no more operations we return the answer
+		return myEquation;
+	}
+	
+	//takes the string and removes all unnecessary letts and symbols
+	private void trimEquation()
+	{
+		String newEquation = "";
+		for(int i = 0; i<equation.length(); i++)
+		{
+			//sees if the char is number
+			if((int) (equation.charAt(i)) >=48 && equation.charAt(i)<=57)
+				newEquation = newEquation + equation.charAt(i);
+			//if char is +
+			else if(equation.charAt(i) ==43)
+				newEquation = newEquation + equation.charAt(i);
+			//else if char is -
+			else if(equation.charAt(i) ==45)
+				newEquation = newEquation + equation.charAt(i);
+			//else if char is *
+			else if(equation.charAt(i) ==42)
+				newEquation = newEquation + equation.charAt(i);
+			//else if char is /
+			else if(equation.charAt(i) ==47)
+				newEquation = newEquation + equation.charAt(i);
+			//else if char is ^
+			else if(equation.charAt(i) ==94)
+				newEquation = newEquation + equation.charAt(i);
+			//else if char is .
+			else if(equation.charAt(i) ==46)
+				newEquation = newEquation + equation.charAt(i);
+			//else if char is x or X
+			else if(equation.charAt(i) == 120 || equation.charAt(i) == 88)
+				newEquation = newEquation + "x";
+		}
+		
+		equation = newEquation;
+	}
+	
+	//self explanatory- MATH METHODS
+	public String multiply(String object, String object2)
+	{
+		boolean notAllNumbers  = false;
+		for(int i = 0; i<object.length(); i++)
+		{
+			if((object.charAt(i) >=48 && object.charAt(i)<=57) || object.charAt(i) == 46)
+			{
+				notAllNumbers = true;
+			}
+		}
+		
+		for(int i = 0; i<object2.length(); i++)
+		{
+			if((object2.charAt(i) >=48 && object2.charAt(i)<=57) || object2.charAt(i) == 46)
+			{
+				notAllNumbers = true;
+			}
+		}
+	    
+		if(notAllNumbers)
+		{
+			String answer = (Double.parseDouble(object)*Double.parseDouble(object2))+"";
+			if(answer.substring(answer.indexOf(".")).length() > 4)
+			{
+				answer.substring(0, answer.indexOf(".")+4);
+			}
+			return answer.substring(0, answer.length()-1);
+		
+		}
+		return object + object2;
+	}
+	
+	public String divide(String object,String object2)
+	{
+		boolean notAllNumbers  = false;
+		for(int i = 0; i<object.length(); i++)
+		{
+			if((object.charAt(i) >=48 && object.charAt(i)<=57) || object.charAt(i) == 46)
+			{
+				notAllNumbers = true;
+			}
+		}
+		
+		for(int i = 0; i<object2.length(); i++)
+		{
+			if((object2.charAt(i) >=48 && object2.charAt(i)<=57) || object2.charAt(i) == 46)
+			{
+				notAllNumbers = true;
+			}
+		}
+	    
+		if(notAllNumbers)
+		{
+			String answer = (Double.parseDouble(object)/Double.parseDouble(object2))+"";
+			if(answer.substring(answer.indexOf(".")).length() > 4)
+			{
+				answer.substring(0, answer.indexOf(".")+4);
+			}
+			return answer.substring(0, answer.length()-1);
+		
+		}
+		return object + object2;
+	}
+	
+	public String add(String object, String object2)
+	{
+		boolean notAllNumbers  = false;
+		for(int i = 0; i<object.length(); i++)
+		{
+			if((object.charAt(i) >=48 && object.charAt(i)<=57) || object.charAt(i) == 46)
+			{
+				notAllNumbers = true;
+			}
+		}
+		
+		for(int i = 0; i<object2.length(); i++)
+		{
+			if((object2.charAt(i) >=48 && object2.charAt(i)<=57) || object2.charAt(i) == 46)
+			{
+				notAllNumbers = true;
+			}
+		}
+	    
+		if(notAllNumbers)
+		{
+			
+			String answer = (Double.parseDouble(object)+Double.parseDouble(object2))+"";
+			if(answer.substring(answer.indexOf(".")).length() > 4)
+			{
+				answer.substring(0, answer.indexOf(".")+4);
+			}
+			return answer.substring(0, answer.length()-1);
+		
+		}
+		return object + object2;
+	}
+	  
+	public String subtract(String object, String object2)
+	{
+		boolean notAllNumbers  = false;
+		for(int i = 0; i<object.length(); i++)
+		{
+			if((object.charAt(i) >=48 && object.charAt(i)<=57) || object.charAt(i) == 46)
+			{
+				notAllNumbers = true;
+			}
+		}
+		
+		for(int i = 0; i<object2.length(); i++)
+		{
+			if((object2.charAt(i) >=48 && object2.charAt(i)<=57) || object2.charAt(i) == 46)
+			{
+				notAllNumbers = true;
+			}
+		}
+	    
+		if(notAllNumbers)
+		{
+			String answer = (Double.parseDouble(object)-Double.parseDouble(object2))+"";
+			if(answer.substring(answer.indexOf(".")).length() > 4)
+			{
+				answer.substring(0, answer.indexOf(".")+4);
+			}
+			return answer.substring(0, answer.length()-1);
+		
+		}
+		return object + object2;
+	}
+	
+	public String power(String object, String object2)
+	{
+
+		boolean notAllNumbers  = false;
+		for(int i = 0; i<object.length(); i++)
+		{
+			if((object.charAt(i) >=48 && object.charAt(i)<=57) || object.charAt(i) == 46)
+			{
+				notAllNumbers = true;
+			}
+		}
+		
+		for(int i = 0; i<object2.length(); i++)
+		{
+			if((object2.charAt(i) >=48 && object2.charAt(i)<=57) || object2.charAt(i) == 46)
+			{
+				notAllNumbers = true;
+			}
+		}
+	    
+		if(notAllNumbers)
+		{
+			String answer = (Math.pow(Double.parseDouble(object), Double.parseDouble(object2)))+"";
+			if(answer.substring(answer.indexOf(".")).length() > 4)
+			{
+				answer.substring(0, answer.indexOf(".")+4);
+			}
+			return answer.substring(0, answer.length()-1);
+		
+		}
+		return object + object2;
+	}
+	
+	public void createPoints()
+	{
+		for(double i = -10.0; i<=10.0; i++ )
+		{
+			allPoints.add(new Point(i, Double.parseDouble(findAnswer(equation, i))));
+		}
+	}
+	
+	//GRAPHICS METHODS- CREATE AND SHOW ALL POINTS
+	public void renderEachPoint(Graphics g)
+	{
+	   for(Point p : allPoints)
+	   {
+	      p.renderPoint(g);
+	   }
+	}
    
-   public double createEq()
+   //OTHER NUMERICAL METHODS
+   public double getMaxYint()
    {
-      int nigga = 0;
-      this.convert();
-      //rusn through operator class, and for each String determines what it is and does the appropriate operations
-      for(int i = 0; i < operator.size(); i++)
-      {
-         String test = operator.get(i);
-         if(test.equals("*"))
-         {
-           nigga += this.multiply(numbers.get(i), numbers.get(i+1));
-         }
-         else if(test.equals("/"))
-         {
-            nigga +=this.divide(numbers.get(i), numbers.get(i+1));
-         }
-         else if(test.equals("+"))
-         {
-           nigga+= this.add(numbers.get(i), numbers.get(i+1));
-         }
-         else
-         {
-            nigga+=this.subtract(numbers.get(i), numbers.get(i+1));
-         }
-      }
-      return nigga;
-   }
-   //self explanatory
-   public double multiply(Double object, Double object2)
-   {
-      double combine = object.doubleValue() * object2.doubleValue();
-      return combine;
-   }
-   public double divide(Double object,Double object2)
-   {
-      double combine = object.doubleValue()/object2.doubleValue();
-      return combine;
-   }
-   public double add(Double object, Double object2)
-   {
-      double combine = object.doubleValue() * object2.doubleValue();
-      return combine;
-   }
-   public double subtract(Double object, Double object2)
-   {
-      double combine = object.doubleValue() * object2.doubleValue();
-      return combine;
-   }
-   //needs work, but should run from -10 to 10 and get y-values for each x-value
-   public double Math()
-   {
-      double yvar = 0;
-      this.createEq();
-   }
-   
-   /*public void renderEachPoint()
-
-   {
-
-      for(int i = 0; i<points.size(); i++)
-
-      {
-
-         points.get(i).renderEachPoint();
-
-      }
-
-   }
-
-   
-
-   public int getY(int i)
-
-   {
-
-     return 
-
-   }
-
-   
-
-   public int getMaxYint i)
-
-   {
-
-      int max;
-
-      max = points.get(0).getPointY();
-
+      double max;
+      max = allPoints.get(0).getPointY();
       //max = points.getPointY(0);
-
       
-
-      for(int i = 0; i<points.size(); i++)
-
+      for(int i = 1; i<allPoints.size(); i++)
       {
-
-         if(points.get(i) > max)
-
-            max = points.get(i).getPointY();
-
+         if(allPoints.get(i).getPointY() > max)
+            max = allPoints.get(i).getPointY();
       }
-
       return max;
-
       
-
    }
-
    
-
-   public int getMinY()
-
+   public double getMinY()
    {
-
-      int min;
-
-      min = points.get(0).getXPoint;
-
+      double min;
+      min = allPoints.get(0).getPointY();
       
-
-   
-
-      for(int i = 0; i<points.size(); i++)
-
+      for(int i = 1; i<allPoints.size(); i++)
       {
-
-         if(points.get(i) < min)
-
-            min = points.get(i).getPointY();
-
+         if(allPoints.get(i).getPointY() < min)
+            min = allPoints.get(i).getPointY();
       } 
-
       return min;
-      
-      
-*/
+   }
    
 
 }
