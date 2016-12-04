@@ -13,6 +13,8 @@ public class Line
 	String equation;
 	private ArrayList<Point> allPoints;
 
+	private int size;
+
 	//CONSTRUCTORS
 	public Line(String inputLine)
 	{
@@ -59,8 +61,9 @@ public class Line
 		else if(myEquation.indexOf("*") != -1)
 		{
 			int positionOfMultiply = myEquation.indexOf("*");
+		
 			String part1 = myEquation.substring(0, positionOfMultiply);
-			String part2 = myEquation.substring(positionOfMultiply + 1);
+			String part2 = myEquation.substring(positionOfMultiply+1);
 			myEquation = multiply(findAnswer(part1, x), findAnswer(part2, x));
 		}
 		else if(myEquation.indexOf("/") != -1)
@@ -117,14 +120,6 @@ public class Line
 	}
 	
 	//self explanatory- MATH METHODS
-	public void printArray()
-	{
-		for(int i =0; i<allPoints.size(); i++)
-		{
-			System.out.println(allPoints.get(i));
-		}
-	
-	}
 	public String multiply(String object, String object2)
 	{
 		boolean notAllNumbers  = false;
@@ -146,7 +141,6 @@ public class Line
 	    
 		if(notAllNumbers)
 		{
-			
 			return (Double.parseDouble(object)*Double.parseDouble(object2))+"";
 		
 		}
@@ -265,20 +259,19 @@ public class Line
 	
 	public void createPoints()
 	{
-		for(double i = -10.0; i<=10.0; i++ )
+		for(double i = 0.0; i<=10; i+=0.01 )
 		{			
-		  System.out.println(Double.parseDouble(findAnswer(equation, 2)));
-		  //Point myPoint = new Point(i, Double.parseDouble(findAnswer(equation, i)));
-		  //allPoints.add(myPoint);
+		  Point myPoint = new Point(i, Double.parseDouble(findAnswer(equation, i)));
+		  allPoints.add(myPoint);
 		}
 	}
 	
 	//GRAPHICS METHODS- CREATE AND SHOW ALL POINTS
-	public void renderEachPoint(Graphics g)
+	public void renderEachPoint(Graphics g, int x, int y)
 	{
 	   for(Point p : allPoints)
 	   {
-	      p.renderPoint(g);
+	      p.renderPoint(g, x, y);
 	   }
 	}
    
@@ -311,5 +304,13 @@ public class Line
       return min;
    }
    
-
+   public int getSize()
+   {
+   	return allPoints.size();
+   }
+   
+   public Point getPointAt(int i)
+   {
+   	return allPoints.get(i);
+   }
 }
